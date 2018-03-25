@@ -34,9 +34,9 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-  double kP = 0.12;
+  double kP = 0.12; // 0.35 was wide swings; 0.05 went off the road. keep 0.12
   double kI = 0.00;
-  double kD = 3.5;
+  double kD = 3.5; // 0riginal was 3.5; 0.004 was wide swwings; 5 was ok but not better than 3.5
 
   pid.Init(kP, kI, kD);
 
@@ -57,7 +57,12 @@ int main()
           double speed = std::stod(j[1]["speed"].get<std::string>());
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value = 0.0;
-          double throttle = 0.8;
+          double throttle = 1.0;
+          const double max_speed = 60;
+
+          // DEBUG
+          std::cout << "Recvd:  CTE: " << cte << " Speed: " << speed << " Angle: " << angle << std::endl;
+ 
           /*
           * TODO: Calcuate steering value here, remember the steering value is
           * [-1, 1].
@@ -65,15 +70,15 @@ int main()
           * another PID controller to control the speed!
           */
         
-          if (fabs(cte) > 0.5) {
-            throttle = 0.5;
+          if (fabs(cte) > 0.2) { // original was 0.5
+            throttle = 0.3; // original was 0.5
           }
 
           if (fabs(pid.p_error_ - cte) > 0.1 and 
               fabs(pid.p_error_ - cte) <= 0.2) {
             throttle = 0.0;
           }
-          else if (fabs(pid.p_error_ - cte) > 0.2 and speed > 30) {
+          else if (fabs(pid.p_error_ - cte) > 0.2 and speed > max_speed) {
             throttle = -0.2;
           }  
           pid.UpdateError(cte);
@@ -87,6 +92,16 @@ int main()
           else if (steer_value < -1) {
             steer_value = -1;
           }
+
+          // Drive with speed up to 60 mph
+          if (speed < max_speed) {
+            throttle += 0.1;
+            if (throttle > 1.0) throttle = 1.0;
+          }
+          else if (speed > max_speed) {
+            throttle = -0.2;
+          }
+          // Drive with speed up to 100 mph
  
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
