@@ -34,9 +34,9 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-  double kP = 0.12; // 0.35 was wide swings; 0.05 went off the road. keep 0.12
-  double kI = 0.00;
-  double kD = 3.5; // 0riginal was 3.5; 0.004 was wide swwings; 5 was ok but not better than 3.5
+  double kP = 0.12; 
+  double kI = 0.0; 
+  double kD = 3.5; 
 
   pid.Init(kP, kI, kD);
 
@@ -80,9 +80,10 @@ int main()
           }
           else if (fabs(pid.p_error_ - cte) > 0.2 and speed > max_speed) {
             throttle = -0.2;
-          }  
+          }
+  
           pid.UpdateError(cte);
-          //steer_value = (- pid.Kp_ * cte) - (pid.Kd_ * pid.diff_cte_) - (pid.Ki_* pid.int_cte_);
+
           steer_value = -pid.TotalError();
 
           // The valid range for steer_value is {-1..1]
@@ -93,7 +94,7 @@ int main()
             steer_value = -1;
           }
 
-          // Drive with speed up to 60 mph
+          // Drive with speed up to what is allowed by max_speed.
           if (speed < max_speed) {
             throttle += 0.1;
             if (throttle > 1.0) throttle = 1.0;
@@ -101,7 +102,7 @@ int main()
           else if (speed > max_speed) {
             throttle = -0.2;
           }
-          // Drive with speed up to 100 mph
+          
  
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
