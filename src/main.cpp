@@ -34,8 +34,8 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-  double kP = 0.12; 
-  double kI = 0.0; 
+  double kP = 0.15; 
+  double kI = 0.01; 
   double kD = 3.5; 
 
   pid.Init(kP, kI, kD);
@@ -58,7 +58,7 @@ int main()
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value = 0.0;
           double throttle = 1.0;
-          const double max_speed = 60;
+          const double max_speed = 50;
 
           // DEBUG
           std::cout << "Recvd:  CTE: " << cte << " Speed: " << speed << " Angle: " << angle << std::endl;
@@ -70,8 +70,8 @@ int main()
           * another PID controller to control the speed!
           */
         
-          if (fabs(cte) > 0.2) { // original was 0.5
-            throttle = 0.3; // original was 0.5
+          if (fabs(cte) > 0.2) { 
+            throttle = 0.3; 
           }
 
           if (fabs(pid.p_error_ - cte) > 0.1 and 
